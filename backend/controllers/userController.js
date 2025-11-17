@@ -152,10 +152,21 @@ const GetMyProfile = CatchAsync(async (req, res, next) => {
   });
 });
 
+
+const CheckAuth = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in check AUth controller", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   GetProfile,
   EditProfile,
   SuggestedUsers,
   FollowAndUnfollowUsers,
   GetMyProfile,
+  CheckAuth
 };

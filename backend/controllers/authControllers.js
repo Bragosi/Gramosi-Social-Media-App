@@ -146,10 +146,10 @@ createSendToken(user, 200, res, "Email has been verified")
 const ResendOTP = CatchAsync(async (req, res, next) => {
   const { email } = req.user;
   if (!email) {
-    return next(new AppError("Email is required", 400));
+    return next(new AppError("Username or Email is required", 400));
   }
 
-  const user = await UsersModel.findOne({ email });
+  const user = await UsersModel.findOne({email});
   if (!user) {
     return next(new AppError("User not found", 404));
   }
