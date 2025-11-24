@@ -8,7 +8,7 @@ const path = require('path');
 const AppError = require('./utils/AppError');
 const userRouter = require('./routes/UserRoutes');
 const postRouter = require('./routes/PostRoutes')
-const globalErrorHandler = require('./controllers/errorController'); 
+const globalErrorHandler = require('./controllers/ErrorController'); 
 
 const app = express();
 
@@ -21,7 +21,11 @@ app.use(helmet());
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production' ? ['https://yourdomain.com'] : ['http://localhost:5173'],
+origin:
+  process.env.NODE_ENV === "production"
+    ? ["https://gramosi.onrender.com"]
+    : ["http://localhost:5173"],
+
     credentials: true,
   })
 );
@@ -37,7 +41,16 @@ app.use(mongoSanitize());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/posts', postRouter);
 
-// 404 handler
+
+if (process.env.NODE_ENV === "production") {
+  const frontPath = path.join(__dirname, "..", "frontend", "dist");
+  app.use(express.static(frontPath));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(frontPath, "index.html"));
+  });
+}
+
 // 404 handler (must come after all routes)
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));
