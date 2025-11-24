@@ -9,6 +9,16 @@ import VerifyAccountPage from "./pages/VerifyAccountPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import CreatePost from "./pages/CreatePost";
+import MobileNavigation from "./components/MobileNavigation";
+import SettingsPage from "./pages/SettingsPage";
+import SearchPage from "./pages/SearchPage";
+import Profilepage from "./pages/Profilepage";
+import Header from "./components/Header";
+import OtherUserProfiles from "./pages/OtherUserProfiles";
+import EditProfilePage from "./pages/EditProfilePage";
+import UserPosts from "./pages/UserPosts";
+import SinglePost from "./pages/SinglePost";
 
 export default function App() {
   const { authUser, checkAuth, isCheckingAuth } = UseAuthStore();
@@ -38,18 +48,35 @@ export default function App() {
           </div>
         </div>
       ) : (
-        <Routes>
-          <Route
+        <div>
+          <Header />
+          <Routes>
+            {/** <Route
             path="/"
             element={authUser ? <HomePage /> : <Navigate to="/login" />}
-          />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/verifyAccount" element={<VerifyAccountPage />} />
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
-          <Route path="/resetPassword" element={<ResetPasswordPage />} />
-          <Route path="/changePassword" element={<ChangePasswordPage />} />
-        </Routes>
+          /> */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/verifyAccount" element={<VerifyAccountPage />} />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/resetPassword" element={<ResetPasswordPage />} />
+            <Route path="/changePassword" element={<ChangePasswordPage />} />
+            <Route path="/createPost" element={<CreatePost />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/profile" element={<Profilepage />} />
+            <Route
+              path="/otherUsersProfile/:id"
+              element={<OtherUserProfiles />}
+            />
+            <Route path="/editProfile" element={<EditProfilePage />} />
+           <Route path="/userPosts/:id" element={<UserPosts />} />
+           <Route path="/post/:id" element={<SinglePost />} />
+
+          </Routes>
+          <MobileNavigation />
+        </div>
       )}
       <Toaster />
     </div>

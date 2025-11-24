@@ -37,7 +37,7 @@ const ForgotPassword = () => {
           />
         </div>
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          Forgot Password
+          Forgot Password ?
         </h1>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

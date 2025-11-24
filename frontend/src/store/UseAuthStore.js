@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
-export const UseAuthStore = create((set, get) => ({
+export const UseAuthStore = create((set) => ({
   authUser: null,
   isCheckingAuth: true,
   isSigningUp: false,
@@ -13,11 +13,14 @@ export const UseAuthStore = create((set, get) => ({
   isSendingOtp: false,
   isResetingPassword: false,
   isChangingPassword: false,
+  isEditingProfile: false,
+  isFollowing: false,
 
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/users/checkAuth");
-      set({ authUser: res.data.data.user });
+      set({ authUser: res.data });
+      console.log('authData', res.data);
     } catch (error) {
       set({ authUser: null });
       console.log(error);
@@ -44,7 +47,6 @@ export const UseAuthStore = create((set, get) => ({
 
   verifyAccount: async (formData) => {
     set({ isVerifyingAccount: true });
-
     try {
       const res = await axiosInstance.post("/users/verify", formData);
       set({ authUser: res.data.data.user });
@@ -94,7 +96,7 @@ export const UseAuthStore = create((set, get) => ({
       toast.success(res.data.message || "Logout successful!");
       return true;
     } catch (error) {
-      toast.error(error, "Logout failed");
+      toast.error(error?.response?.data?.message || "Logout failed");
       return false;
     } finally {
       set({ isLogingOut: false });
@@ -147,4 +149,36 @@ export const UseAuthStore = create((set, get) => ({
       set({ isChangingPassword: false });
     }
   },
+
+  editProfile: async (formData) => {
+    set({ isEditingProfile: true });
+    try {
+      const res = await axiosInstance.post("/users/editProfile", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      set({ authUser: res.data.data.user });
+      toast.success("Profile updated");
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Profile update failed");
+    } finally {
+      set({ isEditingProfile: false });
+    }
+  },
+
+followAndUnfollow: async (userId) => {
+  set({ isFollowing: true });
+  try {
+    const res = await axiosInstance.post(`/users/followAndUnfollow/${userId}`);
+    set({ authUser: res.data.data.user }); // update authUser globally
+    toast.success(res.data.message);
+    return res.data.data.user; // return updated user
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Action failed");
+  } finally {
+    set({ isFollowing: false });
+  }
+},
+
 }));

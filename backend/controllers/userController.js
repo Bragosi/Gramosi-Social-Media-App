@@ -14,7 +14,7 @@ const GetProfile = CatchAsync(async (req, res, next) => {
       "-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires -passwordConfirm"
     )
     .populate({
-      path: "post",
+      path: "posts",
       options: { sort: { createdAt: -1 } },
     })
     .populate({
@@ -139,9 +139,18 @@ const FollowAndUnfollowUsers = CatchAsync(async (req, res, next) => {
 
 // ✅ Get Authenticated User Profile
 const GetMyProfile = CatchAsync(async (req, res, next) => {
-  const user = await UsersModel.findById(req.user.id).select(
-    "-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires -passwordConfirm"
-  );
+  const user = await UsersModel.findById(req.user.id)
+    .select(
+      "-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires -passwordConfirm"
+    )
+    .populate({
+      path: "posts",
+      options: { sort: { createdAt: -1 } }
+    })
+    .populate({
+      path: "savedPosts",
+      options: { sort: { createdAt: -1 } }
+    });
 
   if (!user) return next(new AppError("User not authenticated", 404));
 
@@ -168,5 +177,5 @@ module.exports = {
   SuggestedUsers,
   FollowAndUnfollowUsers,
   GetMyProfile,
-  CheckAuth
+  CheckAuth,
 };

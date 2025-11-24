@@ -7,16 +7,22 @@ cloudinary.config({
     timeout:60000
 })
 
-const UploadToCloudinary = async(fileUrl)=>{
+const UploadToCloudinary = async(fileUrl, options = {}) => {
     try {
-        const response = await cloudinary.uploader.upload(fileUrl, { folder: "gramosi_profiles" })
+        const response = await cloudinary.uploader.upload(fileUrl, {
+            folder: "gramosi_profiles",
+            resource_type: options.resource_type || "auto",
+            format: options.format,
+            eager: options.eager
+        });
 
-        return response
+        return response;
     } catch (error) {
-        console.log(error)
-        throw  new Error("Failed to Upload Image to cloudinary")
+        console.log(error);
+        throw new Error("Failed to Upload Media to cloudinary");
     }
-}
+};
+
 
 module.exports = {
     cloudinary,

@@ -35,7 +35,7 @@ const ChangePasswordPage = () => {
 
     const result = await changePassword(formData);
     if (result) {
-      navigate("/login");
+      navigate("/");
     }
   };
 

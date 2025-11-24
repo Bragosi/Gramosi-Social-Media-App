@@ -4,8 +4,6 @@ const isAuthenticated = require('../middleware/isAuthenticated')
 const { GetProfile, EditProfile, SuggestedUsers, FollowAndUnfollowUsers, GetMyProfile, CheckAuth } = require('../controllers/userController')
 const upload = require('../middleware/multer')
 
-
-
 const router = express.Router()
 // ✅ Auth  Routes
 router.post('/signUp', signUp)

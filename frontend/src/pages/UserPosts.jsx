@@ -1,53 +1,43 @@
-import { useEffect, useState } from "react";
-import SideBar from "../components/SideBar";
+import React, { useEffect, useState } from "react";
 import { UsePostStore } from "../store/UsePostStore";
-import { Heart, MessageCircle, Bookmark, EllipsisVertical } from "lucide-react";
-import { Link } from "react-router-dom";
 import { UseAuthStore } from "../store/UseAuthStore";
-import PostBar from "../components/PostBar";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import SideBar from "../components/SideBar";
 
-const HomePage = () => {
+
+const UserPosts = () => {
+  const {id} =useParams()
+  console.log("User ID from params:", id);
+
+  const {authUser } =UseAuthStore()
+  const { userPosts, isGettingUsersPosts, getUserPosts, addComment, saveOrUnsavePost, likeAndDislikePost } = UsePostStore();
   const [openbar, setopenbar] = useState(null);
-  const {
-    getAllPost,
-    posts,
-    isGettingPosts,
-    likeAndDislikePost,
-    saveOrUnsavePost,
-    addComment,
-  } = UsePostStore();
-  
-  const { authUser } = UseAuthStore();
-
-  const [commentText, setCommentText] = useState("");
   const [activePost, setActivePost] = useState(null);
-  useEffect(() => {
-    getAllPost();
-  }, []);
+    const [commentText, setCommentText] = useState("");
 
-  const handleLike = async (postId) => {
-    // Optimistic UI update
-    const updatedPosts = posts.map((post) =>
-      post._id === postId
-        ? {
-            ...post,
-            likes: post.likes.includes(authUser._id)
-              ? post.likes.filter((id) => id !== authUser._id) // remove like
-              : [...post.likes, authUser._id], // add like
-          }
-        : post
-    );
 
-    // Update store locally
-    UsePostStore.setState({ posts: updatedPosts });
+const handleLike = async (postId) => {
+  if (!authUser) return toast.error("You must be logged in");
 
-    // Sync with backend
-    await likeAndDislikePost(postId);
-  };
+  const updated = userPosts.map((post) =>
+    post._id === postId
+      ? {
+          ...post,
+          likes: post.likes.includes(authUser._id)
+            ? post.likes.filter((id) => id !== authUser._id)
+            : [...post.likes, authUser._id],
+        }
+      : post
+  );
 
-  const handleSave = async (postId) => {
-    await saveOrUnsavePost(postId);
-  };
+  // Update local UI
+  UsePostStore.setState({ userPosts: updated });
+
+  // Update backend
+  await likeAndDislikePost(postId);
+};
 
   const handleAddComment = async (postId) => {
     if (!commentText.trim()) return;
@@ -56,15 +46,23 @@ const HomePage = () => {
     setActivePost(null);
   };
 
+  const handleSave = async (postId) => {
+    await saveOrUnsavePost(postId);
+  };
+
+useEffect(() => {
+  if (id) getUserPosts(id);
+}, [id]);
+
+
   return (
     <div className="min-h-screen  flex">
       <div className="hidden md:block">
         <SideBar />
       </div>
-
       <main className="flex-1 px-4 pt-20 max-w-xl mx-auto">
         {/* LOADING SKELETON */}
-        {isGettingPosts && (
+        {isGettingUsersPosts && (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
               <div
@@ -83,65 +81,64 @@ const HomePage = () => {
             ))}
           </div>
         )}
-
         {/* NO POSTS */}
-        {!isGettingPosts && posts?.length === 0 && (
+        {!isGettingUsersPosts && userPosts?.length === 0 && (
           <p className="text-center text-gray-500 mt-10 text-lg">
             No posts yet
           </p>
         )}
 
-        {/* POSTS */}
+     {/* POSTS */}
         <div className="flex flex-col gap-7 pb-10">
-          {posts.map((post) => (
+          {userPosts.map((posts) => (
             <div
-              key={post._id}
+              key={posts._id}
               className="bg-gray-200 rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
             >
               {/* TOP SECTION */}
               <div className="flex w-full justify-between">
                 <Link
-                  to={`/otherUsersProfile/${post.user._id}`}
+                  to={`/otherUsersProfile/${posts.user._id}`}
                   className="flex items-center gap-3 p-4 cursor-pointer"
                 >
                   <img
-                    src={post.user.profilePicture || "/avatar.png"}
+                    src={posts.user.profilePicture || "/avatar.png"}
                     className="w-11 h-11 rounded-full object-cover"
                   />
                   <div>
                     <p className="font-semibold text-sm">
-                      {post.user.userName}
+                      {posts.user.userName}
                     </p>
                   </div>
                 </Link>
                 <button
                   className="p-4"
                   onClick={() => {
-                    setopenbar(post);
+                    setopenbar(posts);
                   }}
                 >
                   <EllipsisVertical className="size-5" />
                 </button>
               </div>
               {/* CAPTION */}
-              {post.caption && (
+              {posts.caption && (
                 <p className="px-4 pb-2 text-md font-serif font-medium text-gray-700">
-                  {post.caption}
+                  {posts.caption}
                 </p>
               )}
 
               {/* MEDIA */}
-              {post.media?.type === "image" && (
+              {posts.media?.type === "image" && (
                 <img
-                  src={post.media.url}
+                  src={posts.media.url}
                   className="w-full aspect-[4/5] object-cover bg-gray-200"
                   loading="lazy"
                 />
               )}
 
-              {post.media?.type === "video" && (
+              {posts.media?.type === "video" && (
                 <video
-                  src={post.media.url}
+                  src={posts.media.url}
                   controls
                   className="w-full aspect-[4/5] object-cover bg-gray-200"
                 />
@@ -150,34 +147,34 @@ const HomePage = () => {
               {/* ACTION BAR */}
               <div className="flex items-center justify-between px-4 py-3 border-t">
                 <button
-                  onClick={() => handleLike(post._id)}
+                  onClick={() => handleLike(posts._id)}
                   className="flex items-center gap-1 hover:scale-110 transition-transform"
                 >
                   <Heart
                     size={22}
                     className={
-                      post.likes.includes(authUser._id)
+                      posts.likes.includes(authUser._id)
                         ? "text-red-500 fill-red-500"
                         : "text-gray-600"
                     }
                   />
-                  <span className="text-sm">{post.likes.length}</span>
+                  <span className="text-sm">{posts.likes.length}</span>
                 </button>
 
                 <button
                   onClick={() =>
-                    setActivePost(activePost === post._id ? null : post._id)
+                    setActivePost(activePost === posts._id ? null : posts._id)
                   }
                   className="flex items-center gap-1 text-blue-500 hover:scale-110 transition-transform"
                 >
                   <MessageCircle size={22} />
-                  <span className="text-sm">{post.comments.length}</span>
+                  <span className="text-sm">{posts.comments.length}</span>
                 </button>
 
                 <button
-                  onClick={() => handleSave(post._id)}
+                  onClick={() => handleSave(posts._id)}
                   className={`hover:scale-110 transition-transform ${
-                    authUser?.savedPosts?.includes(post._id)
+                    authUser?.savedPosts?.includes(posts._id)
                       ? "text-blue-600 fill-blue-600"
                       : "text-gray-600"
                   }`}
@@ -187,11 +184,11 @@ const HomePage = () => {
               </div>
 
               {/* COMMENT SECTION */}
-              {activePost === post._id && (
+              {activePost === posts._id && (
                 <div className="px-4 pb-4">
                   {/* EXISTING COMMENTS */}
                   <div className="mt-3 space-y-3">
-                    {post.comments.map((c) => (
+                    {posts.comments.map((c) => (
                       <div key={c._id} className="flex gap-2 items-start">
                         <img
                           src={c.user.profilePicture || "/avatar.png"}
@@ -216,12 +213,12 @@ const HomePage = () => {
                       className="flex-1 px-4 py-2 text-sm rounded-full border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none"
                     />
                     <button
-                      onClick={() => handleAddComment(post._id)}
+                      onClick={() => handleAddComment(posts._id)}
                       className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm hover:bg-blue-700"
                     >
                       Send
                     </button>
-                  </div> 
+                  </div>
                 </div>
               )}
             </div>
@@ -233,4 +230,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default UserPosts;

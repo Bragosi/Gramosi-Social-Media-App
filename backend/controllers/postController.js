@@ -241,6 +241,36 @@ const LikeAndDislikePost = CatchAsync(async (req, res, next) => {
   }
 });
 
+const GetSinglePost = CatchAsync(async (req, res, next) => {
+  const postId = req.params.id;
+  const post = await PostModel.findById(postId)
+    .populate({
+      path: "user",
+      select: "userName profilePicture bio",
+    })
+    .populate({
+      path: "comments",
+      select: "text user",
+      populate: {
+        path: "user",
+        select: "userName profilePicture",
+      },
+    });
+
+  if (!post) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Post not found",
+    });
+  }
+
+  return res.status(200).json({
+    status: "success",
+    data: { post },
+  });
+});
+
+
 // ✅Add Comment Post Controller (No change)
 const AddComment = CatchAsync(async (req, res, next) => {
   const { id: postId } = req.params;
@@ -267,7 +297,7 @@ const AddComment = CatchAsync(async (req, res, next) => {
     message: "Your comment have been Sent",
     data: { comment },
   });
-});
+}); 
 
 module.exports = {
   CreatePost,
@@ -277,4 +307,5 @@ module.exports = {
   DeletePost,
   LikeAndDislikePost,
   AddComment,
+  GetSinglePost
 };
