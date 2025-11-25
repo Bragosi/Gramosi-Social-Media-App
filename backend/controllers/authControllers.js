@@ -1,24 +1,28 @@
-const UsersModel = require('../models/UserModel');
-const CatchAsync = require('../utils/CatchAsync');
-const GenerateOtp = require('../utils/GenerateOtp');
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
-const hbs = require('hbs');
-const AppError = require('../utils/AppError');
-const sendEmail = require('../utils/email');
+const UsersModel = require("../models/UserModel");
+const CatchAsync = require("../utils/CatchAsync");
+const GenerateOtp = require("../utils/GenerateOtp");
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
+const hbs = require("hbs");
+const AppError = require("../utils/AppError");
+const sendEmail = require("../utils/email");
 
 // ✅ Load email template function
 const loadTemplate = (templateName, replacements) => {
   // Locate the file inside /emailTemplates directory
-  const templatePath = path.join(__dirname, '../emailTemplates', `${templateName}.hbs`);
- 
+  const templatePath = path.join(
+    __dirname,
+    "../emailTemplates",
+    `${templateName}.hbs`
+  );
+
   // Check if the file actually exists before reading it
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Template not found: ${templatePath}`);
   }
 
-  const source = fs.readFileSync(templatePath, 'utf-8');
+  const source = fs.readFileSync(templatePath, "utf-8");
   const template = hbs.compile(source);
   return template(replacements);
 };
@@ -39,18 +43,18 @@ const createSendToken = (user, statusCode, res, message) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-  }; 
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  };
 
-  res.cookie('token', token, cookieOptions);
+  res.cookie("token", token, cookieOptions);
 
   // Hide sensitive data before sending response
   user.password = undefined;
   user.otp = undefined;
 
   res.status(statusCode).json({
-    status: 'success',
+    status: "success",
     message,
     token,
     data: { user },
@@ -61,9 +65,9 @@ const createSendToken = (user, statusCode, res, message) => {
 const signUp = CatchAsync(async (req, res, next) => {
   const { email, password, passwordConfirm, userName } = req.body;
 
-if (!userName || !email || !password || !passwordConfirm) {
-  return next(new AppError("Please fill all fields", 400));
-}
+  if (!userName || !email || !password || !passwordConfirm) {
+    return next(new AppError("Please fill all fields", 400));
+  }
   // Check for duplicate email or username
   const existingUser = await UsersModel.findOne({
     $or: [{ email }, { userName }],
@@ -73,8 +77,8 @@ if (!userName || !email || !password || !passwordConfirm) {
     return next(
       new AppError(
         existingUser.email === email
-          ? 'User with this email already exists'
-          : 'Username is already taken',
+          ? "User with this email already exists"
+          : "Username is already taken",
         400
       )
     );
@@ -93,17 +97,17 @@ if (!userName || !email || !password || !passwordConfirm) {
     otpExpires,
   });
   // ✅ Load and compile OTP email template
-  const htmlTemplate = loadTemplate('otpTemplate', {
-    title: 'OTP Verification',
+  const htmlTemplate = loadTemplate("otpTemplate", {
+    title: "OTP Verification",
     userName: newUser.userName,
     otp,
-    message: 'Your one-time password (OTP) for account verification is:',
+    message: "Your one-time password (OTP) for account verification is:",
   });
   try {
     // ✅ Send OTP email
     await sendEmail({
       email: newUser.email,
-      subject: 'OTP for Email Verification',
+      subject: "OTP for Email Verification",
       html: htmlTemplate,
     });
     // ✅ Send success response
@@ -111,36 +115,38 @@ if (!userName || !email || !password || !passwordConfirm) {
       newUser,
       201,
       res,
-      'Registration successful. Check your email for OTP verification.'
+      "Registration successful. Check your email for OTP verification."
     );
   } catch (error) {
     // Delete user if email fails to send
     await UsersModel.findByIdAndDelete(newUser._id);
-    return next(new AppError('Error sending OTP. Please try again later.', 500));
+    return next(
+      new AppError("Error sending OTP. Please try again later.", 500)
+    );
   }
 });
 
 // ✅ Verify account Controller
-const verifyAccount = CatchAsync(async (req, res, next)=>{
-  const {otp} = req.body
-  if(!otp){
-    return next(new AppError ("Otp is required for verification", 400))
+const verifyAccount = CatchAsync(async (req, res, next) => {
+  const { otp } = req.body;
+  if (!otp) {
+    return next(new AppError("Otp is required for verification", 400));
   }
-const user = req.user
-if(user.otp !==otp){
-  return next(new AppError("Invalid OTP", 400))
-}
-if(Date.now()> user.otpExpires){
-  return next(new AppError ("OTP has expired, Request for a new OTP", 400))
-}
-user.isVerified = true
-user.otp = undefined
-user.otpExpires = undefined
+  const user = req.user;
+  if (user.otp !== otp) {
+    return next(new AppError("Invalid OTP", 400));
+  }
+  if (Date.now() > user.otpExpires) {
+    return next(new AppError("OTP has expired, Request for a new OTP", 400));
+  }
+  user.isVerified = true;
+  user.otp = undefined;
+  user.otpExpires = undefined;
 
-await user.save({validateBeforeSave : false})
+  await user.save({ validateBeforeSave: false });
 
-createSendToken(user, 200, res, "Email has been verified")
-})
+  createSendToken(user, 200, res, "Email has been verified");
+});
 
 // ✅ Resend OTP Controller
 const ResendOTP = CatchAsync(async (req, res, next) => {
@@ -149,7 +155,7 @@ const ResendOTP = CatchAsync(async (req, res, next) => {
     return next(new AppError("Username or Email is required", 400));
   }
 
-  const user = await UsersModel.findOne({email});
+  const user = await UsersModel.findOne({ email });
   if (!user) {
     return next(new AppError("User not found", 404));
   }
@@ -166,165 +172,182 @@ const ResendOTP = CatchAsync(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const htmlTemplate = loadTemplate('otpTemplate', {
-    title: 'OTP Verification',
+  const htmlTemplate = loadTemplate("otpTemplate", {
+    title: "OTP Verification",
     userName: user.userName,
     otp,
-    message: 'Your one-time password (OTP) for account verification is:',
+    message: "Your one-time password (OTP) for account verification is:",
   });
 
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Resend OTP Verification',
+      subject: "Resend OTP Verification",
       html: htmlTemplate,
     });
 
     res.status(200).json({
-      status: 'success',
-      message: 'A new OTP has been sent to your email.',
+      status: "success",
+      message: "A new OTP has been sent to your email.",
     });
   } catch (error) {
     user.otp = undefined;
     user.otpExpires = undefined;
     await user.save({ validateBeforeSave: false });
-    return next(new AppError("There was an error resending OTP. Please try again later.", 500));
+    return next(
+      new AppError(
+        "There was an error resending OTP. Please try again later.",
+        500
+      )
+    );
   }
 });
 
 // ✅Login Controller
-const Login = CatchAsync(async (req, res,next)=>{
-  const {identifier, password} = req.body
-  if(!identifier || !password){
-    return next(new AppError("Please Provide Email/Username and Password", 400))
+const Login = CatchAsync(async (req, res, next) => {
+  const { identifier, password } = req.body;
+  if (!identifier || !password) {
+    return next(
+      new AppError("Please Provide Email/Username and Password", 400)
+    );
   }
   const user = await UsersModel.findOne({
-    $or : [{email : identifier}, {userName : identifier}]
-  }).select("+password")
+    $or: [{ email: identifier }, { userName: identifier }],
+  }).select("+password");
 
-if (!user) {
-  return next(new AppError("Incorrect Email or Password", 401));
-}
-if (!user.isVerified) {
-  return next(new AppError("Please verify your email before logging in.", 401));
-}
-  if(!user || !(await user.correctPassword(password, user.password))){
-    return next(new AppError("Incorrect Email or Password", 401))
+  if (!user) {
+    return next(new AppError("Incorrect Email or Password", 401));
   }
-  createSendToken(user, 200, res, "Login Successful")
-})
+  if (!user.isVerified) {
+    return next(
+      new AppError("Please verify your email before logging in.", 401)
+    );
+  }
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError("Incorrect Email or Password", 401));
+  }
+  createSendToken(user, 200, res, "Login Successful");
+});
 
 // ✅Logout Controller
-const Logout = CatchAsync(async (req, res, next)=>{
-  res.cookie("token", "loggedout",{
-    expires : new Date(Date.now() + 10 * 1000),
-    httpOnly : true,
-    secure : process.env.NODE_ENV === 'production'
-  })
+const Logout = CatchAsync(async (req, res, next) => {
+  res.cookie("token", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // ← fix here too
+  });
   res.status(200).json({
-    status: 'success',
-    message : "Logged Out Successful"
-  })
-})
+    status: "success",
+    message: "Logged Out Successful",
+  });
+});
 
 // ✅Forgot Password Controller
-const ForgotPassword = CatchAsync(async (req, res, next)=>{
-const {identifier} = req.body
-const user = await UsersModel.findOne({
-  $or :  [{email : identifier}, {userName : identifier}]
-})
-if(!user){
-  return next(new AppError("No User Found", 404))
-}
-const otp = GenerateOtp()
-const resetExpires = Date.now()+ 300000 
+const ForgotPassword = CatchAsync(async (req, res, next) => {
+  const { identifier } = req.body;
+  const user = await UsersModel.findOne({
+    $or: [{ email: identifier }, { userName: identifier }],
+  });
+  if (!user) {
+    return next(new AppError("No User Found", 404));
+  }
+  const otp = GenerateOtp();
+  const resetExpires = Date.now() + 300000;
 
-user.resetPasswordOTP=otp
-user.resetPasswordOTPExpires=resetExpires
+  user.resetPasswordOTP = otp;
+  user.resetPasswordOTPExpires = resetExpires;
 
-await user.save({validateBeforeSave : false })
+  await user.save({ validateBeforeSave: false });
 
-const htmlTemplate = loadTemplate("otpTemplate", {
-  title: "Reset Passoword OTP",
-  userName : user.userName,
-  otp,
-  message: "Your Password Reset OTp is : "
-})
-try {
-  await sendEmail({
-    email : user.email,
-    subject : "Password reset otp (Valid for 5min)",
-    html : htmlTemplate
-  })
-  res.status(200).json({
-    status : "success",
-    message : "Password reset otp is sent to your email"
-  })
-} catch (error) {
-  user.resetPasswordOTP=undefined,
-  user.resetPasswordOTPExpires=undefined
-  await user.save({validateBeforeSave : false})
-  return next(
-    new AppError("There was an error sending the email. Try again Later!", 500)
-  )
-}
-})
+  const htmlTemplate = loadTemplate("otpTemplate", {
+    title: "Reset Passoword OTP",
+    userName: user.userName,
+    otp,
+    message: "Your Password Reset OTp is : ",
+  });
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password reset otp (Valid for 5min)",
+      html: htmlTemplate,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "Password reset otp is sent to your email",
+    });
+  } catch (error) {
+    (user.resetPasswordOTP = undefined),
+      (user.resetPasswordOTPExpires = undefined);
+    await user.save({ validateBeforeSave: false });
+    return next(
+      new AppError(
+        "There was an error sending the email. Try again Later!",
+        500
+      )
+    );
+  }
+});
 
 // ✅Reset Password Controller
-const ResetPassword = CatchAsync(async (req, res,next)=>{
-  const {identifier, otp, password, passwordConfirm}= req.body
+const ResetPassword = CatchAsync(async (req, res, next) => {
+  const { identifier, otp, password, passwordConfirm } = req.body;
   const user = await UsersModel.findOne({
-    $or :
-    [{email : identifier}, {userName : identifier}],
-    resetPasswordOTP : otp,
-    resetPasswordOTPExpires : {$gt: Date.now()}
-  })
-  if (!user){
-    return next(new AppError("No User Found", 400))
+    $or: [{ email: identifier }, { userName: identifier }],
+    resetPasswordOTP: otp,
+    resetPasswordOTPExpires: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new AppError("No User Found", 400));
   }
-  user.password=password
-  user.passwordConfirm=passwordConfirm
-  user.resetPasswordOTP=undefined 
-  user.resetPasswordOTPExpires=undefined
-  await user.save()
-  createSendToken(user, 200, res, 'Password Reset Successful')
-})
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.resetPasswordOTP = undefined;
+  user.resetPasswordOTPExpires = undefined;
+  await user.save();
+  createSendToken(user, 200, res, "Password Reset Successful");
+});
 
 // ✅Change Password Controller
 const ChangePassword = CatchAsync(async (req, res, next) => {
   const { currentPassword, newPassword, newPasswordConfirm } = req.body;
   const { email } = req.user;
 
-  const user = await UsersModel.findOne({ email }).select('+password');
+  const user = await UsersModel.findOne({ email }).select("+password");
 
   if (!user) {
-    return next(new AppError('User not found', 404));
+    return next(new AppError("User not found", 404));
   }
 
-  const isPasswordCorrect = await user.correctPassword(currentPassword, user.password);
+  const isPasswordCorrect = await user.correctPassword(
+    currentPassword,
+    user.password
+  );
   if (!isPasswordCorrect) {
-    return next(new AppError('Incorrect current password', 400));
+    return next(new AppError("Incorrect current password", 400));
   }
 
   if (newPassword !== newPasswordConfirm) {
-    return next(new AppError("New password and confirm password don't match", 400));
+    return next(
+      new AppError("New password and confirm password don't match", 400)
+    );
   }
 
   user.password = newPassword;
   user.passwordConfirm = newPasswordConfirm;
   await user.save();
 
-  createSendToken(user, 200, res, 'Password has been successfully changed');
+  createSendToken(user, 200, res, "Password has been successfully changed");
 });
 
 // Export Controllers
 module.exports = {
-  signUp, 
+  signUp,
   verifyAccount,
   ResendOTP,
   Login,
   Logout,
   ForgotPassword,
   ResetPassword,
-  ChangePassword
-}
+  ChangePassword,
+};
