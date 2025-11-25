@@ -4,7 +4,7 @@ import { UseAuthStore } from "../store/UseAuthStore";
 import { useNavigate } from "react-router-dom";
 
 const PostBar = ({ close, post }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { isDeletingPost, deletePosts } = UsePostStore();
   const { authUser, followAndUnfollow } = UseAuthStore();
 
@@ -37,7 +37,7 @@ const PostBar = ({ close, post }) => {
 
   const handleDeletePost = async () => {
     await deletePosts(post._id);
-    navigate("/")
+    navigate("/");
     close();
   };
 
@@ -50,37 +50,37 @@ const PostBar = ({ close, post }) => {
         >
           <X size={26} />
         </button>
-<div className="flex justify-center items-center">
+        <div className="flex justify-center items-center">
           {isOwner && (
-          <button
-            onClick={handleDeletePost}
-            className="text-red-600 font-semibold"
-          >
-            {isDeletingPost ? (
-              <div className="flex items-center gap-2">
-                <Loader className="size-5 animate-spin" />
-                <span>Deleting...</span>
-              </div>
-            ) : (
-              "Delete Post"
-            )}
-          </button>
-        )}
-        {!isOwner && (
-          <button
-            onClick={handleFollowUser}
-            className={`mt-3 px-4 py-2 rounded-lg font-semibold transition-colors ${
-              (userProfile.followers || []).includes(authUser._id)
-                ? " bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {(userProfile.followers || []).includes(authUser._id)
-              ? "Follow"
-              : "UnFollow"}
-          </button>
-        )}
-</div>
+            <button
+              onClick={handleDeletePost}
+              className="text-red-600 font-semibold"
+            >
+              {isDeletingPost ? (
+                <div className="flex items-center gap-2 mt-3 px-4 py-2 rounded-lg font-semibold transition-colors bg-red-600 text-white hover:bg-red-700">
+                  <Loader className="size-5 animate-spin" />
+                  <span>Deleting...</span>
+                </div>
+              ) : (
+                "Delete Post"
+              )}
+            </button>
+          )}
+          {!isOwner && (
+            <button
+              onClick={handleFollowUser}
+              className={`mt-3 px-4 py-2 rounded-lg font-semibold transition-colors ${
+                (userProfile.followers || []).includes(authUser._id)
+                  ? " bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-600 text-white hover:bg-gray-700"
+              }`}
+            >
+              {(userProfile.followers || []).includes(authUser._id)
+                ? "Follow"
+                : "UnFollow"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { UseAuthStore } from "../store/UseAuthStore";
 import PostBar from "../components/PostBar";
 import toast from "react-hot-toast";
-import Avatar from '../../public/avatar.png'
+import Avatar from "../../public/avatar.png";
 
 const HomePage = () => {
   const [openbar, setopenbar] = useState(null);
@@ -71,9 +71,9 @@ const HomePage = () => {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar only for logged-in users on desktop */}
-        <div className="hidden md:block">
-          <SideBar />
-        </div>
+      <div className="hidden md:block">
+        <SideBar />
+      </div>
 
       <main className="flex-1 px-4 pt-20 max-w-xl mx-auto">
         {/* Loading Skeleton */}
@@ -115,7 +115,7 @@ const HomePage = () => {
               <div className="flex w-full justify-between">
                 <Link
                   to={`/otherUsersProfile/${post.user?._id || "unknown"}`}
-                  className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 transition"
+                  className="flex items-center gap-3 p-4 cursor-pointer transition"
                 >
                   <img
                     src={post.user?.profilePicture || Avatar}
@@ -128,12 +128,11 @@ const HomePage = () => {
                     </p>
                   </div>
                 </Link>
-                <button
-                  className="p-4 hover:bg-gray-100 rounded-full transition"
-                  onClick={() => setopenbar(post)}
-                >
-                  <EllipsisVertical className="size-5" />
-                </button>
+                {authUser && (
+                  <button className="p-4" onClick={() => setopenbar(post)}>
+                    <EllipsisVertical className="size-5" />
+                  </button>
+                )}
               </div>
 
               {/* Caption */}
@@ -179,7 +178,8 @@ const HomePage = () => {
 
                 <button
                   onClick={() =>
-                  setActivePost(activePost === post._id ? null : post._id)}
+                    setActivePost(activePost === post._id ? null : post._id)
+                  }
                   className="flex items-center gap-1 text-blue-500 hover:scale-110 transition-transform"
                 >
                   <MessageCircle size={22} />
