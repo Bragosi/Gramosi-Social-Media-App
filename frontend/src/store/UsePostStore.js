@@ -46,7 +46,6 @@ export const UsePostStore = create((set) => ({
 
     try {
       const res = await axiosInstance.get("/posts/all");
-
       set({ posts: res.data.data.posts });
       return res.data.data.posts;
     } catch (error) {
@@ -62,9 +61,7 @@ export const UsePostStore = create((set) => ({
 
     try {
       const res = await axiosInstance.get(`/posts/userPost/${id}`);
-
       set({ userPosts: res.data.data.posts });
-
       return res.data.data.posts;
     } catch (error) {
       toast.error(error.response?.data?.message || "Request failed");
@@ -179,7 +176,6 @@ export const UsePostStore = create((set) => ({
     try {
       const res = await axiosInstance.get(`/posts/singlePosts/${postId}`);
      set({ singlePosts: res.data.data.post });
-     console.log('singlePosts',res.data.data.post )
       return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Request failed");
