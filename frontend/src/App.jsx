@@ -44,7 +44,7 @@ export default function App() {
           <div className="absolute bottom-0 mb-7 flex flex-col items-center justify-center gap-9">
             <h1 className="font-serif text-gray-700 text-2xl">Gramosi</h1>
             <h1 className="font-serif text-xl text-gray-700">
-              Created by <span className="text-blue-700 ">Automadev</span>
+              Created by <span className="text-blue-700 ">Bragosi</span>
             </h1>
           </div>
         </div>
