@@ -20,7 +20,7 @@ export const UseAuthStore = create((set) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/users/checkAuth");
-      set({ authUser: res.data });
+      set({ authUser: res.data.data.user });
       console.log('authData', res.data);
     } catch (error) {
       set({ authUser: null });
