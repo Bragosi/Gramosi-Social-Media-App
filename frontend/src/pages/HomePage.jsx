@@ -5,6 +5,7 @@ import { Heart, MessageCircle, Bookmark, EllipsisVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { UseAuthStore } from "../store/UseAuthStore";
 import PostBar from "../components/PostBar";
+import toast from "react-hot-toast";
 
 const HomePage = () => {
   const [openbar, setopenbar] = useState(null);
@@ -28,7 +29,7 @@ const HomePage = () => {
 
   const handleLike = async (postId) => {
     if (!authUser) {
-      alert("Please log in to like posts");
+      toast.error("You're not Logged In");
       return;
     }
 
@@ -49,7 +50,7 @@ const HomePage = () => {
 
   const handleSave = async (postId) => {
     if (!authUser) {
-      alert("Please log in to save posts");
+      toast.error("You're not Logged In");
       return;
     }
     await saveOrUnsavePost(postId);
@@ -57,7 +58,7 @@ const HomePage = () => {
 
   const handleAddComment = async (postId) => {
     if (!authUser) {
-      alert("Please log in to comment");
+      toast.error("You're not Logged In");
       return;
     }
     if (!commentText.trim()) return;
@@ -177,10 +178,7 @@ const HomePage = () => {
 
                 <button
                   onClick={() =>
-                    authUser
-                      ? setActivePost(activePost === post._id ? null : post._id)
-                      : alert("Please log in to comment")
-                  }
+                  setActivePost(activePost === post._id ? null : post._id)}
                   className="flex items-center gap-1 text-blue-500 hover:scale-110 transition-transform"
                 >
                   <MessageCircle size={22} />
