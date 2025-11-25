@@ -104,7 +104,7 @@ const HomePage = () => {
           </p>
         )}
 
-        {/* Posts Feed */}
+        {/* Post Feed */}
         <div className="flex flex-col gap-7 pb-10">
           {posts.map((post) => (
             <div

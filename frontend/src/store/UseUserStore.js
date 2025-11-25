@@ -9,7 +9,7 @@ export const UseUserStore = create((set) => ({
   isGettingUserProfile: false,
   isGettingSuggestedUsers: false,
   isGettingMyProfile: false,
-  // ✅ GET ANOTHER USER PROFILE
+
   getProfile: async (id) => {
     set({ isGettingUserProfile: true });
     try {
@@ -22,7 +22,7 @@ export const UseUserStore = create((set) => ({
     }
   },
 
-  // ✅ SUGGESTED USERS
+
   getSuggestedUsers: async () => {
     set({ isGettingSuggestedUsers: true });
     try {
@@ -37,7 +37,6 @@ export const UseUserStore = create((set) => ({
     }
   },
 
-  // ✅ GET MY PROFILE
   myProfile: async () => {
     set({ isGettingMyProfile: true });
     try {
