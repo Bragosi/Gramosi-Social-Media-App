@@ -18,7 +18,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Security & utilities
 app.use(cookieParser());
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,   // This instantly fixes Cloudinary images
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 app.use(
   cors({

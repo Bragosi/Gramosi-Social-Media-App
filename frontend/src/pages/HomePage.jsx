@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { UseAuthStore } from "../store/UseAuthStore";
 import PostBar from "../components/PostBar";
 import toast from "react-hot-toast";
+import Avatar from '../../public/avatar.png'
 
 const HomePage = () => {
   const [openbar, setopenbar] = useState(null);
@@ -108,7 +109,7 @@ const HomePage = () => {
           {posts.map((post) => (
             <div
               key={post._id}
-              className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
+              className="bg-gray-200 rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
             >
               {/* Author Header */}
               <div className="flex w-full justify-between">
@@ -117,7 +118,7 @@ const HomePage = () => {
                   className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 transition"
                 >
                   <img
-                    src={post.user?.profilePicture || "/avatar.png"}
+                    src={post.user?.profilePicture || Avatar}
                     alt="avatar"
                     className="w-11 h-11 rounded-full object-cover"
                   />
