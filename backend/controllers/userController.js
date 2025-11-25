@@ -5,7 +5,7 @@ const { UploadToCloudinary } = require("../utils/cloudinary");
 const GetDataUri = require("../utils/dataUrl");
 
 
- // ✅ Get Another User's Profile
+ // Get Another User's Profile
 const GetProfile = CatchAsync(async (req, res, next) => {
   const { id } = req.params;
 
@@ -30,7 +30,7 @@ const GetProfile = CatchAsync(async (req, res, next) => {
   });
 });
 
-// ✅ Edit Profile
+// Edit Profile
 const EditProfile = CatchAsync(async (req, res, next) => {
   const userId = req.user.id;
   const { bio } = req.body;
@@ -66,7 +66,7 @@ const EditProfile = CatchAsync(async (req, res, next) => {
   });
 });
 
-//✅ Suggested Users
+//Suggested Users
 const SuggestedUsers = CatchAsync(async (req, res, next) => {
   const loggedInUserId = req.user.id;
 
@@ -83,7 +83,7 @@ const SuggestedUsers = CatchAsync(async (req, res, next) => {
   });
 });
 
-//✅ Follow or Unfollow a User
+//Follow or Unfollow a User
 const FollowAndUnfollowUsers = CatchAsync(async (req, res, next) => {
   const loggedInUserId = req.user.id;
   const targetUserId = req.params.id;
@@ -137,7 +137,7 @@ const FollowAndUnfollowUsers = CatchAsync(async (req, res, next) => {
   });
 });
 
-// ✅ Get Authenticated User Profile
+// Get Authenticated User Profile
 const GetMyProfile = CatchAsync(async (req, res, next) => {
   const user = await UsersModel.findById(req.user.id)
     .select(

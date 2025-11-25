@@ -8,7 +8,7 @@ const hbs = require("hbs");
 const AppError = require("../utils/AppError");
 const sendEmail = require("../utils/email");
 
-// ✅ Load email template function
+// Load email template function
 const loadTemplate = (templateName, replacements) => {
   // Locate the file inside /emailTemplates directory
   const templatePath = path.join(
@@ -27,14 +27,14 @@ const loadTemplate = (templateName, replacements) => {
   return template(replacements);
 };
 
-// ✅ Generate JWT Token
+// Generate JWT Token
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-// ✅ Send token + response
+// Send token + response
 const createSendToken = (user, statusCode, res, message) => {
   const token = signToken(user._id);
 
@@ -61,7 +61,7 @@ const createSendToken = (user, statusCode, res, message) => {
   });
 };
 
-// ✅ User Signup Controller
+// User Signup Controller
 const signUp = CatchAsync(async (req, res, next) => {
   const { email, password, passwordConfirm, userName } = req.body;
 
@@ -126,7 +126,7 @@ const signUp = CatchAsync(async (req, res, next) => {
   }
 });
 
-// ✅ Verify account Controller
+// Verify account Controller
 const verifyAccount = CatchAsync(async (req, res, next) => {
   const { otp } = req.body;
   if (!otp) {
@@ -148,7 +148,7 @@ const verifyAccount = CatchAsync(async (req, res, next) => {
   createSendToken(user, 200, res, "Email has been verified");
 });
 
-// ✅ Resend OTP Controller
+// Resend OTP Controller
 const ResendOTP = CatchAsync(async (req, res, next) => {
   const { email } = req.user;
   if (!email) {
@@ -203,7 +203,7 @@ const ResendOTP = CatchAsync(async (req, res, next) => {
   }
 });
 
-// ✅Login Controller
+// Login Controller
 const Login = CatchAsync(async (req, res, next) => {
   const { identifier, password } = req.body;
   if (!identifier || !password) {
@@ -229,7 +229,7 @@ const Login = CatchAsync(async (req, res, next) => {
   createSendToken(user, 200, res, "Login Successful");
 });
 
-// ✅Logout Controller
+// Logout Controller
 const Logout = CatchAsync(async (req, res, next) => {
   res.cookie("token", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
@@ -243,7 +243,7 @@ const Logout = CatchAsync(async (req, res, next) => {
   });
 });
 
-// ✅Forgot Password Controller
+// Forgot Password Controller
 const ForgotPassword = CatchAsync(async (req, res, next) => {
   const { identifier } = req.body;
   const user = await UsersModel.findOne({
@@ -289,7 +289,7 @@ const ForgotPassword = CatchAsync(async (req, res, next) => {
   }
 });
 
-// ✅Reset Password Controller
+// Reset Password Controller
 const ResetPassword = CatchAsync(async (req, res, next) => {
   const { identifier, otp, password, passwordConfirm } = req.body;
   const user = await UsersModel.findOne({
@@ -308,7 +308,7 @@ const ResetPassword = CatchAsync(async (req, res, next) => {
   createSendToken(user, 200, res, "Password Reset Successful");
 });
 
-// ✅Change Password Controller
+// Change Password Controller
 const ChangePassword = CatchAsync(async (req, res, next) => {
   const { currentPassword, newPassword, newPasswordConfirm } = req.body;
   const { email } = req.user;

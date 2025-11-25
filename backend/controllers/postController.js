@@ -6,27 +6,29 @@ const PostModel = require("../models/PostModel");
 const UsersModel = require("../models/UserModel");
 const CommentModel = require("../models/CommentModel");
 
-// ✅Create Post Controller (Images + Videos)
+// Create Post Controller
 const CreatePost = CatchAsync(async (req, res, next) => {
   const { caption } = req.body;
   const file = req.file; // Image or video
   const userId = req.user._id;
 
   if (!file) {
-    return next(new AppError("Media (image or video) is required to post", 400));
+    return next(
+      new AppError("Media (image or video) is required to post", 400)
+    );
   }
 
-  const isImage = file.mimetype.startsWith('image/');
-  const isVideo = file.mimetype.startsWith('video/');
+  const isImage = file.mimetype.startsWith("image/");
+  const isVideo = file.mimetype.startsWith("video/");
   if (!isImage && !isVideo) {
     return next(new AppError("Invalid file type: Must be image or video", 400));
   }
 
-  const mediaType = isImage ? 'image' : 'video';
+  const mediaType = isImage ? "image" : "video";
   const resourceType = mediaType;
 
   let processedBuffer = file.buffer;
-  let uploadFormat = file.mimetype.split('/')[1];
+  let uploadFormat = file.mimetype.split("/")[1];
   let thumbnailUrl = null;
 
   if (isImage) {
@@ -34,30 +36,39 @@ const CreatePost = CatchAsync(async (req, res, next) => {
       .resize({ width: 800, height: 800, fit: "inside" })
       .toFormat("jpeg", { quality: 80 })
       .toBuffer();
-    uploadFormat = 'jpeg';
+    uploadFormat = "jpeg";
   } else if (isVideo) {
     processedBuffer = file.buffer;
   }
 
   const maxSizes = { image: 10 * 1024 * 1024, video: 100 * 1024 * 1024 };
   if (file.size > maxSizes[mediaType]) {
-    return next(new AppError(`${mediaType} too large (max ${maxSizes[mediaType] / (1024*1024)}MB)`, 400));
+    return next(
+      new AppError(
+        `${mediaType} too large (max ${maxSizes[mediaType] / (1024 * 1024)}MB)`,
+        400
+      )
+    );
   }
 
-  const fileUri = `data:${file.mimetype};base64,${processedBuffer.toString("base64")}`;
-  const uploadOptions = { 
+  const fileUri = `data:${file.mimetype};base64,${processedBuffer.toString(
+    "base64"
+  )}`;
+  const uploadOptions = {
     resource_type: resourceType,
     format: uploadFormat,
   };
   if (isVideo) {
-    uploadOptions.eager = [{ 
-      video_sampling_ratio: 2,
-      format: 'jpg', 
-      quality: 80,
-      crop: 'fill',
-      width: 400,
-      height: 300 
-    }];
+    uploadOptions.eager = [
+      {
+        video_sampling_ratio: 2,
+        format: "jpg",
+        quality: 80,
+        crop: "fill",
+        width: 400,
+        height: 300,
+      },
+    ];
   }
   const cloudResponse = await UploadToCloudinary(fileUri, uploadOptions);
 
@@ -71,13 +82,17 @@ const CreatePost = CatchAsync(async (req, res, next) => {
       url: cloudResponse.secure_url,
       publicId: cloudResponse.public_id,
       type: mediaType,
-      thumbnailUrl
+      thumbnailUrl,
     },
     user: userId,
   });
 
   // Add Post to User Posts (atomic update)
-  await UsersModel.findByIdAndUpdate(userId, { $push: { posts: post._id } }, { validateBeforeSave: false });
+  await UsersModel.findByIdAndUpdate(
+    userId,
+    { $push: { posts: post._id } },
+    { validateBeforeSave: false }
+  );
 
   post = await PostModel.findById(post._id).populate({
     path: "user",
@@ -90,9 +105,14 @@ const CreatePost = CatchAsync(async (req, res, next) => {
   });
 });
 
-// ✅Get All Post Controller (No change)
+// Get All Post Controller
 const GetAllPost = CatchAsync(async (req, res, next) => {
-  const posts = await PostModel.find()
+  const limit = parseInt(req.query.limit) || 10;
+  const cursor = req.query.cursor; // _id of the last post from previous page
+
+  const query = cursor ? { _id: { $lt: cursor } } : {}; // MongoDB cursor pagination
+
+  const posts = await PostModel.find(query)
     .populate({
       path: "user",
       select: "userName profilePicture bio",
@@ -105,16 +125,25 @@ const GetAllPost = CatchAsync(async (req, res, next) => {
         select: "userName profilePicture",
       },
     })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .limit(limit + 1); // Get one extra to know if there's more
 
-  return res.status(200).json({
+  const hasMore = posts.length > limit;
+  const slicedPosts = hasMore ? posts.slice(0, limit) : posts;
+
+  const shuffledPosts = slicedPosts.sort(() => Math.random() - 0.5);
+
+  res.status(200).json({
     status: "success",
-    result: posts.length,
-    data: { posts },
+    data: {
+      posts: shuffledPosts,
+      nextCursor: hasMore ? posts[limit]._id : null, // ← FIXED
+      hasMore,
+    },
   });
 });
 
-// ✅Get User Post Controller (No change)
+// Get User Post Controller
 const GetUserPost = CatchAsync(async (req, res, next) => {
   const userId = req.params.id;
 
@@ -140,7 +169,7 @@ const GetUserPost = CatchAsync(async (req, res, next) => {
   });
 });
 
-// ✅Save and Unsave Post Controller (No change)
+// Save and Unsave Post Controller
 const SaveOrUnsavePost = CatchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const postId = req.params.postId;
@@ -170,7 +199,7 @@ const SaveOrUnsavePost = CatchAsync(async (req, res, next) => {
   }
 });
 
-// ✅Delete Post Controller (Updated for video type)
+// Delete Post Controller
 const DeletePost = CatchAsync(async (req, res, next) => {
   const { id } = req.params;
   const userId = req.user._id;
@@ -196,8 +225,8 @@ const DeletePost = CatchAsync(async (req, res, next) => {
 
   // Remove media from Cloudinary (image or video)
   if (post.media.publicId) {
-    await cloudinary.uploader.destroy(post.media.publicId, { 
-      resource_type: post.media.type 
+    await cloudinary.uploader.destroy(post.media.publicId, {
+      resource_type: post.media.type,
     });
   }
   // Remove the post
@@ -209,7 +238,7 @@ const DeletePost = CatchAsync(async (req, res, next) => {
   });
 });
 
-// ✅Like and Dislike Post Controller (No change)
+// Like and Dislike Post Controller
 const LikeAndDislikePost = CatchAsync(async (req, res, next) => {
   const postId = req.params.id;
   const userId = req.user._id;
@@ -240,7 +269,7 @@ const LikeAndDislikePost = CatchAsync(async (req, res, next) => {
     });
   }
 });
-
+// Get Single Post controller
 const GetSinglePost = CatchAsync(async (req, res, next) => {
   const postId = req.params.id;
   const post = await PostModel.findById(postId)
@@ -270,8 +299,7 @@ const GetSinglePost = CatchAsync(async (req, res, next) => {
   });
 });
 
-
-// ✅Add Comment Post Controller (No change)
+// Add Comment Post Controller (No change)
 const AddComment = CatchAsync(async (req, res, next) => {
   const { id: postId } = req.params;
   const userId = req.user._id;
@@ -297,7 +325,7 @@ const AddComment = CatchAsync(async (req, res, next) => {
     message: "Your comment have been Sent",
     data: { comment },
   });
-}); 
+});
 
 module.exports = {
   CreatePost,
@@ -307,5 +335,5 @@ module.exports = {
   DeletePost,
   LikeAndDislikePost,
   AddComment,
-  GetSinglePost
+  GetSinglePost,
 };

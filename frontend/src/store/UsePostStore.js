@@ -2,13 +2,15 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { UseAuthStore } from "./UseAuthStore";
-export const UsePostStore = create((set) => ({
+export const UsePostStore = create((set, get) => ({
   posts: [],
   userPosts: [],
   savedPosts: [],
   singlePosts: [],
   isCreatingPost: false,
   isGettingPosts: false,
+  hasMore: true,
+  cursor: null,
   isGettingUsersPosts: false,
   isDeletingPost: false,
   isSavingPost: false,
@@ -41,19 +43,40 @@ export const UsePostStore = create((set) => ({
     }
   },
 
-  getAllPost: async () => {
+ getAllPost: async (isLoadMore = false) => {
+    if (!get().hasMore && isLoadMore) return;
+
     set({ isGettingPosts: true });
 
     try {
-      const res = await axiosInstance.get("/posts/all");
-      set({ posts: res.data.data.posts });
-      return res.data.data.posts;
+      const params = { limit: 10 };
+      if (isLoadMore && get().cursor) {
+        params.cursor = get().cursor;
+      }
+
+      const res = await axiosInstance.get("/posts/all", { params });
+
+      const newPosts = res.data.data.posts;
+      const nextCursor = res.data.data.nextCursor;
+      const hasMore = res.data.data.hasMore;
+
+      set((state) => ({
+        posts: isLoadMore ? [...state.posts, ...newPosts] : newPosts,
+        cursor: nextCursor,
+        hasMore,
+      }));
+
+      return newPosts;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Request failed");
-      return null;
+      toast.error(error.response?.data?.message || "Failed to load posts");
     } finally {
       set({ isGettingPosts: false });
     }
+  },
+
+  // Reset for refresh/pull-to-refresh
+  resetPosts: () => {
+    set({ posts: [], cursor: null, hasMore: true });
   },
 
   getUserPosts: async (id) => {

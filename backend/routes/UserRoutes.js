@@ -5,7 +5,7 @@ const { GetProfile, EditProfile, SuggestedUsers, FollowAndUnfollowUsers, GetMyPr
 const upload = require('../middleware/multer')
 
 const router = express.Router()
-// ✅ Auth  Routes
+// Auth  Routes
 router.post('/signUp', signUp)
 router.post("/verify", isAuthenticated, verifyAccount)
 router.post("/resendOtp", isAuthenticated, ResendOTP)
@@ -15,7 +15,7 @@ router.post("/forgotPassword", ForgotPassword)
 router.post("/resetPassword", ResetPassword)
 router.post("/changePassword", isAuthenticated, ChangePassword)
 
-// ✅ User  Routes
+//  User  Routes
 router.get("/profile/:id", GetProfile)
 router.post("/editProfile", isAuthenticated, upload.single('profilePicture'), EditProfile)
 router.get("/suggestedUsers", isAuthenticated, SuggestedUsers)

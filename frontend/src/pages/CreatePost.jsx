@@ -2,8 +2,10 @@ import SideBar from "../components/SideBar";
 import { useState } from "react";
 import { UsePostStore } from "../store/UsePostStore";
 import { ImagePlus, Loader, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
+  const navigate = useNavigate()
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState("");
   const { createPost, isCreatingPost } = UsePostStore();
@@ -20,6 +22,7 @@ const CreatePost = () => {
     await createPost(caption, file);
     setCaption("");
     setFile(null);
+    navigate("/")
   };
 
   return (

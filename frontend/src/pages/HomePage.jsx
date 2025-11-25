@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import SideBar from "../components/SideBar";
 import { UsePostStore } from "../store/UsePostStore";
 import { Heart, MessageCircle, Bookmark, EllipsisVertical } from "lucide-react";
@@ -9,11 +9,13 @@ import toast from "react-hot-toast";
 import Avatar from "../../public/avatar.png";
 
 const HomePage = () => {
+  const observer = useRef();
   const [openbar, setopenbar] = useState(null);
   const {
     getAllPost,
     posts,
     isGettingPosts,
+    hasMore,
     likeAndDislikePost,
     saveOrUnsavePost,
     addComment,
@@ -25,8 +27,25 @@ const HomePage = () => {
   const [activePost, setActivePost] = useState(null);
 
   useEffect(() => {
-    getAllPost();
+    UsePostStore.getState().resetPosts();
+    getAllPost(false);
   }, [getAllPost]);
+
+  const lastPostRef = useCallback(
+    (node) => {
+      if (isGettingPosts) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          getAllPost(true); // load more
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isGettingPosts, hasMore, getAllPost]
+  );
 
   const handleLike = async (postId) => {
     if (!authUser) {
@@ -77,7 +96,7 @@ const HomePage = () => {
 
       <main className="flex-1 px-4 pt-20 max-w-xl mx-auto">
         {/* Loading Skeleton */}
-        {isGettingPosts && (
+        {isGettingPosts && posts.length === 0 && (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
               <div
@@ -99,16 +118,17 @@ const HomePage = () => {
 
         {/* No Posts */}
         {!isGettingPosts && posts?.length === 0 && (
-          <p className="text-center text-gray-500 mt-10 text-lg">
+          <p className="text-center flex justify-center text-gray-500 mt-10 text-lg">
             No posts yet
           </p>
         )}
 
         {/* Post Feed */}
         <div className="flex flex-col gap-7 pb-10">
-          {posts.map((post) => (
+          {posts.map((post, index) => (
             <div
               key={post._id}
+              ref={index === posts.length - 1 ? lastPostRef : null}
               className="bg-gray-200 rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
             >
               {/* Author Header */}
@@ -238,7 +258,19 @@ const HomePage = () => {
             </div>
           ))}
         </div>
+        {/* Loading more indicator */}
+        {isGettingPosts && posts.length > 0 && (
+          <div className="flex justify-center py-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        )}
 
+        {/* End of feed */}
+        {!hasMore && posts.length > 0 && (
+          <p className="text-center text-gray-500 py-8">
+            You're all caught up!
+          </p>
+        )}
         {openbar && <PostBar post={openbar} close={() => setopenbar(null)} />}
       </main>
     </div>

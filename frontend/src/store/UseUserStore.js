@@ -27,8 +27,7 @@ export const UseUserStore = create((set) => ({
     set({ isGettingSuggestedUsers: true });
     try {
       const res = await axiosInstance.get("/users/suggestedUsers");
-      set({ suggestedUsers: res.data.data.users }); // backend returns "users"
-         console.log('suggested', res.data.data.users )
+      set({ suggestedUsers: res.data.data.users }); 
       return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not load users");
@@ -41,9 +40,7 @@ export const UseUserStore = create((set) => ({
     set({ isGettingMyProfile: true });
     try {
       const res = await axiosInstance.post("/users/myProfile");
-      console.log("my profile", res.data.data.user);
       set({ profile: res.data.data.user });
-      console.log("profile", res.data.data.user);
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not load profile");
     } finally {
