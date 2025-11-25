@@ -22,7 +22,7 @@ export const UseUserStore = create((set) => ({
     }
   },
 
-  // ✅ SUGGESTED USERSee
+  // ✅ SUGGESTED USERS
   getSuggestedUsers: async () => {
     set({ isGettingSuggestedUsers: true });
     try {
