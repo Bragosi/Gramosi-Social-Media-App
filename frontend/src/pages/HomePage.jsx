@@ -16,40 +16,50 @@ const HomePage = () => {
     saveOrUnsavePost,
     addComment,
   } = UsePostStore();
-  
+
   const { authUser } = UseAuthStore();
 
   const [commentText, setCommentText] = useState("");
   const [activePost, setActivePost] = useState(null);
+
   useEffect(() => {
     getAllPost();
-  }, []);
+  }, [getAllPost]);
 
   const handleLike = async (postId) => {
-    // Optimistic UI update
+    if (!authUser) {
+      alert("Please log in to like posts");
+      return;
+    }
+
     const updatedPosts = posts.map((post) =>
       post._id === postId
         ? {
             ...post,
             likes: post.likes.includes(authUser._id)
-              ? post.likes.filter((id) => id !== authUser._id) // remove like
-              : [...post.likes, authUser._id], // add like
+              ? post.likes.filter((id) => id !== authUser._id)
+              : [...post.likes, authUser._id],
           }
         : post
     );
 
-    // Update store locally
     UsePostStore.setState({ posts: updatedPosts });
-
-    // Sync with backend
     await likeAndDislikePost(postId);
   };
 
   const handleSave = async (postId) => {
+    if (!authUser) {
+      alert("Please log in to save posts");
+      return;
+    }
     await saveOrUnsavePost(postId);
   };
 
   const handleAddComment = async (postId) => {
+    if (!authUser) {
+      alert("Please log in to comment");
+      return;
+    }
     if (!commentText.trim()) return;
     await addComment(postId, commentText);
     setCommentText("");
@@ -57,13 +67,14 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen  flex">
-      <div className="hidden md:block">
-        <SideBar />
-      </div>
+    <div className="min-h-screen flex">
+      {/* Sidebar only for logged-in users on desktop */}
+        <div className="hidden md:block">
+          <SideBar />
+        </div>
 
       <main className="flex-1 px-4 pt-20 max-w-xl mx-auto">
-        {/* LOADING SKELETON */}
+        {/* Loading Skeleton */}
         {isGettingPosts && (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
@@ -84,71 +95,71 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* NO POSTS */}
+        {/* No Posts */}
         {!isGettingPosts && posts?.length === 0 && (
           <p className="text-center text-gray-500 mt-10 text-lg">
             No posts yet
           </p>
         )}
 
-        {/* POSTS */}
+        {/* Posts Feed */}
         <div className="flex flex-col gap-7 pb-10">
           {posts.map((post) => (
             <div
               key={post._id}
-              className="bg-gray-200 rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
+              className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
             >
-              {/* TOP SECTION */}
+              {/* Author Header */}
               <div className="flex w-full justify-between">
                 <Link
-                  to={`/otherUsersProfile/${post.user._id}`}
-                  className="flex items-center gap-3 p-4 cursor-pointer"
+                  to={`/otherUsersProfile/${post.user?._id || "unknown"}`}
+                  className="flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 transition"
                 >
                   <img
-                    src={post.user.profilePicture || "/avatar.png"}
+                    src={post.user?.profilePicture || "/avatar.png"}
+                    alt="avatar"
                     className="w-11 h-11 rounded-full object-cover"
                   />
                   <div>
                     <p className="font-semibold text-sm">
-                      {post.user.userName}
+                      {post.user?.userName || "Deleted User"}
                     </p>
                   </div>
                 </Link>
                 <button
-                  className="p-4"
-                  onClick={() => {
-                    setopenbar(post);
-                  }}
+                  className="p-4 hover:bg-gray-100 rounded-full transition"
+                  onClick={() => setopenbar(post)}
                 >
                   <EllipsisVertical className="size-5" />
                 </button>
               </div>
-              {/* CAPTION */}
+
+              {/* Caption */}
               {post.caption && (
-                <p className="px-4 pb-2 text-md font-serif font-medium text-gray-700">
+                <p className="px-4 pb-2 text-md font-serif font-medium text-gray-800">
                   {post.caption}
                 </p>
               )}
 
-              {/* MEDIA */}
+              {/* Media */}
               {post.media?.type === "image" && (
                 <img
                   src={post.media.url}
-                  className="w-full aspect-[4/5] object-cover bg-gray-200"
+                  alt="post"
+                  className="w-full aspect-[4/5] object-cover"
                   loading="lazy"
                 />
               )}
-
               {post.media?.type === "video" && (
                 <video
                   src={post.media.url}
                   controls
-                  className="w-full aspect-[4/5] object-cover bg-gray-200"
+                  className="w-full aspect-[4/5] object-cover bg-black"
                 />
               )}
 
-              {/* ACTION BAR */}
-              <div className="flex items-center justify-between px-4 py-3 border-t">
+              {/* Action Bar */}
+              <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50">
                 <button
                   onClick={() => handleLike(post._id)}
                   className="flex items-center gap-1 hover:scale-110 transition-transform"
@@ -156,7 +167,7 @@ const HomePage = () => {
                   <Heart
                     size={22}
                     className={
-                      post.likes.includes(authUser._id)
+                      authUser && post.likes.includes(authUser._id)
                         ? "text-red-500 fill-red-500"
                         : "text-gray-600"
                     }
@@ -166,7 +177,9 @@ const HomePage = () => {
 
                 <button
                   onClick={() =>
-                    setActivePost(activePost === post._id ? null : post._id)
+                    authUser
+                      ? setActivePost(activePost === post._id ? null : post._id)
+                      : alert("Please log in to comment")
                   }
                   className="flex items-center gap-1 text-blue-500 hover:scale-110 transition-transform"
                 >
@@ -186,20 +199,20 @@ const HomePage = () => {
                 </button>
               </div>
 
-              {/* COMMENT SECTION */}
+              {/* Comment Section */}
               {activePost === post._id && (
                 <div className="px-4 pb-4">
-                  {/* EXISTING COMMENTS */}
                   <div className="mt-3 space-y-3">
                     {post.comments.map((c) => (
                       <div key={c._id} className="flex gap-2 items-start">
                         <img
-                          src={c.user.profilePicture || "/avatar.png"}
+                          src={c.user?.profilePicture || "/avatar.png"}
+                          alt="avatar"
                           className="w-7 h-7 rounded-full"
                         />
                         <p className="text-sm bg-gray-100 px-3 py-2 rounded-xl">
                           <span className="font-semibold mr-1">
-                            {c.user.userName}
+                            {c.user?.userName || "Unknown"}
                           </span>
                           {c.text}
                         </p>
@@ -207,7 +220,6 @@ const HomePage = () => {
                     ))}
                   </div>
 
-                  {/* ADD COMMENT INPUT */}
                   <div className="flex gap-2 mt-3">
                     <input
                       value={commentText}
@@ -217,16 +229,17 @@ const HomePage = () => {
                     />
                     <button
                       onClick={() => handleAddComment(post._id)}
-                      className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm hover:bg-blue-700"
+                      className="px-4 py-2 rounded-full bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
                     >
                       Send
                     </button>
-                  </div> 
+                  </div>
                 </div>
               )}
             </div>
           ))}
         </div>
+
         {openbar && <PostBar post={openbar} close={() => setopenbar(null)} />}
       </main>
     </div>
