@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SideBar from "../components/SideBar";
 import { UseUserStore } from "../store/UseUserStore";
 import Avatar from "../../public/avatar.png";
@@ -18,23 +18,20 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen flex ">
-      
       <div className="hidden md:block">
         <SideBar />
       </div>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 lg:px-12 pt-20 w-full max-w-3xl mx-auto overflow-y-auto">
-
         {isGettingMyProfile ? (
           <>
             <HeaderSkeleton />
             <div className="border-b my-6" />
             <GridSkeleton />
           </>
-        ) : ( 
+        ) : (
           <div className=" rounded-2xl shadow-sm p-6">
-
             {/* HEADER SECTION */}
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <img
@@ -44,12 +41,15 @@ export default function ProfilePage() {
               />
 
               <div className="flex-1 w-full">
-
                 {/* Username + Edit */}
                 <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full gap-3">
                   <div className="text-center sm:text-left">
-                    <h1 className="text-2xl font-bold text-gray-900">{profile?.userName}</h1>
-                    <p className="text-sm text-gray-600 mt-1 max-w-xs">{profile?.bio}</p>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {profile?.userName}
+                    </h1>
+                    <p className="text-sm text-gray-600 mt-1 max-w-xs">
+                      {profile?.bio}
+                    </p>
                   </div>
 
                   <button
@@ -63,15 +63,21 @@ export default function ProfilePage() {
                 {/* Stats */}
                 <div className="flex justify-center sm:justify-start gap-8 mt-5 text-center">
                   <div>
-                    <p className="font-semibold text-lg">{profile?.posts?.length || 0}</p>
+                    <p className="font-semibold text-lg">
+                      {profile?.posts?.length || 0}
+                    </p>
                     <p className="text-xs text-gray-500">Posts</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-lg">{profile?.followers?.length || 0}</p>
+                    <p className="font-semibold text-lg">
+                      {profile?.followers?.length || 0}
+                    </p>
                     <p className="text-xs text-gray-500">Followers</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-lg">{profile?.following?.length || 0}</p>
+                    <p className="font-semibold text-lg">
+                      {profile?.following?.length || 0}
+                    </p>
                     <p className="text-xs text-gray-500">Following</p>
                   </div>
                 </div>
@@ -86,7 +92,9 @@ export default function ProfilePage() {
               <button
                 onClick={() => setActiveTab("posts")}
                 className={`flex items-center gap-2 pb-1 ${
-                  activeTab === "posts" ? "border-b-2 border-black text-black" : "hover:text-black"
+                  activeTab === "posts"
+                    ? "border-b-2 border-black text-black"
+                    : "hover:text-black"
                 }`}
               >
                 <Grid size={16} /> Posts
@@ -95,7 +103,9 @@ export default function ProfilePage() {
               <button
                 onClick={() => setActiveTab("saved")}
                 className={`flex items-center gap-2 pb-1 ${
-                  activeTab === "saved" ? "border-b-2 border-black text-black" : "hover:text-black"
+                  activeTab === "saved"
+                    ? "border-b-2 border-black text-black"
+                    : "hover:text-black"
                 }`}
               >
                 <Bookmark size={16} /> Saved
@@ -104,17 +114,16 @@ export default function ProfilePage() {
 
             {/* TAB CONTENT */}
             <div className="mt-8">
-              {activeTab === "posts" && (
-                profile?.posts?.length > 0 ? (
-                  <PostGrid posts={profile.posts}   />
+              {activeTab === "posts" &&
+                (profile?.posts?.length > 0 ? (
+                  <PostGrid posts={profile.posts} />
                 ) : (
-                  <div className="py-20 text-center text-gray-500">No posts yet.</div>
-                )
-              )}
+                  <div className="py-20 text-center text-gray-500">
+                    No posts yet.
+                  </div>
+                ))}
 
-              {activeTab === "saved" && (
-                 <PostGrid posts={profile.savedPosts} />
-              )}
+              {activeTab === "saved" && <PostGrid posts={profile.savedPosts} />}
             </div>
           </div>
         )}

@@ -9,7 +9,7 @@ const CommentModel = require("../models/CommentModel");
 // Create Post Controller
 const CreatePost = CatchAsync(async (req, res, next) => {
   const { caption } = req.body;
-  const file = req.file; // Image or video
+  const file = req.file; 
   const userId = req.user._id;
 
   if (!file) {
@@ -108,9 +108,9 @@ const CreatePost = CatchAsync(async (req, res, next) => {
 // Get All Post Controller
 const GetAllPost = CatchAsync(async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 10;
-  const cursor = req.query.cursor; // _id of the last post from previous page
+  const cursor = req.query.cursor; 
 
-  const query = cursor ? { _id: { $lt: cursor } } : {}; // MongoDB cursor pagination
+  const query = cursor ? { _id: { $lt: cursor } } : {}; 
 
   const posts = await PostModel.find(query)
     .populate({
@@ -126,7 +126,7 @@ const GetAllPost = CatchAsync(async (req, res, next) => {
       },
     })
     .sort({ createdAt: -1 })
-    .limit(limit + 1); // Get one extra to know if there's more
+    .limit(limit + 1); 
 
   const hasMore = posts.length > limit;
   const slicedPosts = hasMore ? posts.slice(0, limit) : posts;
@@ -137,7 +137,7 @@ const GetAllPost = CatchAsync(async (req, res, next) => {
     status: "success",
     data: {
       posts: shuffledPosts,
-      nextCursor: hasMore ? posts[limit]._id : null, // ← FIXED
+      nextCursor: hasMore ? posts[limit]._id : null, 
       hasMore,
     },
   });

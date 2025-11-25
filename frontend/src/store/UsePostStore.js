@@ -107,7 +107,7 @@ export const UsePostStore = create((set, get) => ({
       // Update post store
       set({ savedPosts: res.data.data.savedPosts });
 
-      // 🔥 Update auth user to trigger UI rerender
+      // Update auth user to trigger UI rerender
       UseAuthStore.setState((state) => ({
         authUser: {
           ...state.authUser,

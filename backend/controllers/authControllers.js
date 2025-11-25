@@ -10,14 +10,12 @@ const sendEmail = require("../utils/email");
 
 // Load email template function
 const loadTemplate = (templateName, replacements) => {
-  // Locate the file inside /emailTemplates directory
   const templatePath = path.join(
     __dirname,
     "../emailTemplates",
     `${templateName}.hbs`
   );
 
-  // Check if the file actually exists before reading it
   if (!fs.existsSync(templatePath)) {
     throw new Error(`Template not found: ${templatePath}`);
   }
@@ -68,7 +66,6 @@ const signUp = CatchAsync(async (req, res, next) => {
   if (!userName || !email || !password || !passwordConfirm) {
     return next(new AppError("Please fill all fields", 400));
   }
-  // Check for duplicate email or username
   const existingUser = await UsersModel.findOne({
     $or: [{ email }, { userName }],
   });

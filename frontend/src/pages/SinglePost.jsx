@@ -5,6 +5,7 @@ import PostBar from "../components/PostBar";
 import SideBar from "../components/SideBar";
 import { UseAuthStore } from "../store/UseAuthStore";
 import { Heart, MessageCircle, Bookmark, EllipsisVertical } from "lucide-react";
+
 const SinglePost = () => {
   const { id } = useParams();
   const [openbar, setOpenbar] = useState(null);
@@ -17,16 +18,19 @@ const SinglePost = () => {
     addComment,
     likeAndDislikePost,
   } = UsePostStore();
+
   const [activePost, setActivePost] = useState(null);
   const [commentText, setCommentText] = useState("");
+
   useEffect(() => {
     getSinglePosts(id);
   }, [id]);
+
   const handleSave = async (postId) => {
     await saveOrUnsavePost(postId);
   };
+
   const handleLike = async (postId) => {
-    // 1. Optimistic UI: update singlePosts locally
     const updatedSinglePosts = Array.isArray(singlePosts)
       ? singlePosts.map((post) =>
           post._id === postId
@@ -49,7 +53,6 @@ const SinglePost = () => {
 
     UsePostStore.setState({ singlePosts: updatedSinglePosts });
 
-    // 2. Sync with backend
     if (likeAndDislikePost && typeof likeAndDislikePost === "function") {
       await likeAndDislikePost(postId);
     }
@@ -61,18 +64,12 @@ const SinglePost = () => {
     setCommentText("");
     setActivePost(null);
   };
-  // -----------------------------------------------------
-  // 1. Ensure singlePosts is always an array for mapping
-  // -----------------------------------------------------
   const postsArray = Array.isArray(singlePosts)
     ? singlePosts
     : singlePosts
     ? [singlePosts]
     : [];
 
-  // -----------------------------------------------------
-  // 2. Skeleton Loader Component
-  // -----------------------------------------------------
   const Skeleton = () => (
     <div className="space-y-6 mt-5">
       {[1].map((i) => (

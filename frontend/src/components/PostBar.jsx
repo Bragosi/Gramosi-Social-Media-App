@@ -9,7 +9,7 @@ const PostBar = ({ close, post }) => {
   const { authUser, followAndUnfollow } = UseAuthStore();
 
   const isOwner = post?.user?._id === authUser?._id;
-  const userProfile = post?.user; // full user object
+  const userProfile = post?.user; 
 
   const handleFollowUser = async () => {
     const isFollowing = (userProfile.followers || []).includes(authUser._id);

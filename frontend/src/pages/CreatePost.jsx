@@ -5,7 +5,7 @@ import { ImagePlus, Loader, Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState("");
   const { createPost, isCreatingPost } = UsePostStore();
@@ -22,7 +22,7 @@ const CreatePost = () => {
     await createPost(caption, file);
     setCaption("");
     setFile(null);
-    navigate("/")
+    navigate("/");
   };
 
   return (
@@ -48,35 +48,35 @@ const CreatePost = () => {
               onChange={(e) => setCaption(e.target.value)}
             />
 
-          <div>
-            <input
-              id="fileInput"
-              type="file"
-              accept="image/*,video/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
+            <div>
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*,video/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
 
-            {/* Preview */}
-            {file && (
-              <div className="w-20 mt-2 flex justify-center">
-                {file.type.startsWith("image/") ? (
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="preview"
-                    className="rounded-xl w-full max-h-80 object-cover shadow-md"
-                  />
-                ) : (
-                  <video
-                    src={URL.createObjectURL(file)}
-                    controls
-                    className="rounded-xl w-full max-h-80 shadow-md"
-                  />
-                )}
-              </div>
-            )}
-</div>
- {/* Upload Box */}
+              {/* Preview */}
+              {file && (
+                <div className="w-20 mt-2 flex justify-center">
+                  {file.type.startsWith("image/") ? (
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="preview"
+                      className="rounded-xl w-full max-h-80 object-cover shadow-md"
+                    />
+                  ) : (
+                    <video
+                      src={URL.createObjectURL(file)}
+                      controls
+                      className="rounded-xl w-full max-h-80 shadow-md"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+            {/* Upload Box */}
             <label
               htmlFor="fileInput"
               className="flex flex-col items-center justify-center w-fit cursor-pointer hover:bg-gray-100 transition"

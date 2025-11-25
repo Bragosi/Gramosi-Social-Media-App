@@ -14,7 +14,8 @@ const SkeletonUser = () => (
 );
 
 const SearchPage = () => {
-  const { isGettingSuggestedUsers, suggestedUsers, getSuggestedUsers } = UseUserStore();
+  const { isGettingSuggestedUsers, suggestedUsers, getSuggestedUsers } =
+    UseUserStore();
 
   useEffect(() => {
     getSuggestedUsers();
@@ -34,10 +35,13 @@ const SearchPage = () => {
 
           <div className="bg-white shadow rounded-md overflow-hidden">
             {/* Loading Skeleton */}
-            {isGettingSuggestedUsers && Array.from({ length: 10 }).map((_, i) => <SkeletonUser key={i} />)}
+            {isGettingSuggestedUsers &&
+              Array.from({ length: 10 }).map((_, i) => (
+                <SkeletonUser key={i} />
+              ))}
 
             {/* Users List */}
-            {suggestedUsers?.map(user => (
+            {suggestedUsers?.map((user) => (
               <Link
                 to={`/otherUsersProfile/${user._id}`}
                 key={user._id}
@@ -50,7 +54,9 @@ const SearchPage = () => {
                 />
                 <div>
                   <p className="font-semibold text-gray-800">{user.userName}</p>
-                  <p className="text-sm text-gray-500 truncate w-64">{user.bio}</p>
+                  <p className="text-sm text-gray-500 truncate w-64">
+                    {user.bio}
+                  </p>
                 </div>
               </Link>
             ))}

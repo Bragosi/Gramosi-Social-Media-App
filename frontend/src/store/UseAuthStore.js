@@ -171,9 +171,9 @@ followAndUnfollow: async (userId) => {
   set({ isFollowing: true });
   try {
     const res = await axiosInstance.post(`/users/followAndUnfollow/${userId}`);
-    set({ authUser: res.data.data.user }); // update authUser globally
+    set({ authUser: res.data.data.user }); 
     toast.success(res.data.message);
-    return res.data.data.user; // return updated user
+    return res.data.data.user; 
   } catch (error) {
     toast.error(error.response?.data?.message || "Action failed");
   } finally {

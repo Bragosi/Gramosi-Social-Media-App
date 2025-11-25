@@ -6,38 +6,43 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
 
-
 const UserPosts = () => {
-  const {id} =useParams()
+  const { id } = useParams();
   console.log("User ID from params:", id);
 
-  const {authUser } =UseAuthStore()
-  const { userPosts, isGettingUsersPosts, getUserPosts, addComment, saveOrUnsavePost, likeAndDislikePost } = UsePostStore();
+  const { authUser } = UseAuthStore();
+  const {
+    userPosts,
+    isGettingUsersPosts,
+    getUserPosts,
+    addComment,
+    saveOrUnsavePost,
+    likeAndDislikePost,
+  } = UsePostStore();
   const [openbar, setopenbar] = useState(null);
   const [activePost, setActivePost] = useState(null);
-    const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState("");
 
+  const handleLike = async (postId) => {
+    if (!authUser) return toast.error("You must be logged in");
 
-const handleLike = async (postId) => {
-  if (!authUser) return toast.error("You must be logged in");
+    const updated = userPosts.map((post) =>
+      post._id === postId
+        ? {
+            ...post,
+            likes: post.likes.includes(authUser._id)
+              ? post.likes.filter((id) => id !== authUser._id)
+              : [...post.likes, authUser._id],
+          }
+        : post
+    );
 
-  const updated = userPosts.map((post) =>
-    post._id === postId
-      ? {
-          ...post,
-          likes: post.likes.includes(authUser._id)
-            ? post.likes.filter((id) => id !== authUser._id)
-            : [...post.likes, authUser._id],
-        }
-      : post
-  );
+    // Update local UI
+    UsePostStore.setState({ userPosts: updated });
 
-  // Update local UI
-  UsePostStore.setState({ userPosts: updated });
-
-  // Update backend
-  await likeAndDislikePost(postId);
-};
+    // Update backend
+    await likeAndDislikePost(postId);
+  };
 
   const handleAddComment = async (postId) => {
     if (!commentText.trim()) return;
@@ -50,10 +55,9 @@ const handleLike = async (postId) => {
     await saveOrUnsavePost(postId);
   };
 
-useEffect(() => {
-  if (id) getUserPosts(id);
-}, [id]);
-
+  useEffect(() => {
+    if (id) getUserPosts(id);
+  }, [id]);
 
   return (
     <div className="min-h-screen  flex">
@@ -88,7 +92,7 @@ useEffect(() => {
           </p>
         )}
 
-     {/* POSTS */}
+        {/* POSTS */}
         <div className="flex flex-col gap-7 pb-10">
           {userPosts.map((posts) => (
             <div

@@ -74,7 +74,7 @@ const SuggestedUsers = CatchAsync(async (req, res, next) => {
     .select(
       "-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires -passwordConfirm"
     )
-    .limit(10); // optional: limit suggestions for performance
+    .limit(10); 
 
   res.status(200).json({
     status: "success",

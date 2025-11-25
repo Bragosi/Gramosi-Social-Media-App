@@ -5,7 +5,7 @@ import Avatar from "../../public/avatar.png";
 import { useNavigate } from "react-router-dom";
 
 const EditProfilePage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { editProfile, isEditingProfile, authUser } = UseAuthStore();
 
   const [selectedImage, setSelectedImage] = useState(null);
@@ -32,16 +32,15 @@ const EditProfilePage = () => {
     fd.append("bio", formData.bio);
 
     await editProfile(fd, false);
-    navigate("/profile")
+    navigate("/profile");
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden p-6 relative">
-
         {/* Close Button */}
         <button
-          onClick={()=>navigate("/profile")}
+          onClick={() => navigate("/profile")}
           className="absolute top-4 right-4 text-gray-600 hover:text-red-500 transition"
         >
           <X size={26} />

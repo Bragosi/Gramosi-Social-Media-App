@@ -9,7 +9,7 @@ const VerifyAccountPage = () => {
   const [formData, setFormData] = useState({ otp: "" });
   const { isVerifyingAccount, ResendOTP, verifyAccount } = UseAuthStore();
 
-  const [counter, setCounter] = useState(30); // 30-sec countdown
+  const [counter, setCounter] = useState(30);
 
   const handleVerification = async (e) => {
     e.preventDefault();
@@ -23,10 +23,9 @@ const VerifyAccountPage = () => {
   const handleResend = () => {
     if (counter > 0) return;
     ResendOTP();
-    setCounter(30); // Reset countdown
+    setCounter(30);
   };
 
-  // Countdown effect
   useEffect(() => {
     if (counter === 0) return;
     const timer = setTimeout(() => setCounter(counter - 1), 1000);
