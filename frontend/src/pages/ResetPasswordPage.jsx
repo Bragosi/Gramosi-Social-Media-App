@@ -24,6 +24,7 @@ const ResetPasswordPage = () => {
       return toast.error("Passwords do not match");
     return true;
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 

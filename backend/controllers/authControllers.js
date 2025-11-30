@@ -82,7 +82,7 @@ const signUp = CatchAsync(async (req, res, next) => {
   }
   // Generate OTP and expiry
   const otp = GenerateOtp();
-  const otpExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  const otpExpires = Date.now() + 24 * 60 * 60 * 1000;
 
   // Create new user
   const newUser = await UsersModel.create({
@@ -101,13 +101,13 @@ const signUp = CatchAsync(async (req, res, next) => {
     message: "Your one-time password (OTP) for account verification is:",
   });
   try {
-    // ✅ Send OTP email
+    // Send OTP email
     await sendEmail({
       email: newUser.email,
       subject: "OTP for Email Verification",
       html: htmlTemplate,
     });
-    // ✅ Send success response
+    // Send success response
     createSendToken(
       newUser,
       201,
@@ -206,7 +206,7 @@ const Login = CatchAsync(async (req, res, next) => {
   if (!identifier || !password) {
     return next(
       new AppError("Please Provide Email/Username and Password", 400)
-    );
+    ); 
   }
   const user = await UsersModel.findOne({
     $or: [{ email: identifier }, { userName: identifier }],
@@ -261,7 +261,7 @@ const ForgotPassword = CatchAsync(async (req, res, next) => {
     title: "Reset Passoword OTP",
     userName: user.userName,
     otp,
-    message: "Your Password Reset OTp is : ",
+    message: "Your Password Reset OTP is : ",
   });
   try {
     await sendEmail({
@@ -271,7 +271,7 @@ const ForgotPassword = CatchAsync(async (req, res, next) => {
     });
     res.status(200).json({
       status: "success",
-      message: "Password reset otp is sent to your email",
+      message: "OTP have been sent to your email!",
     });
   } catch (error) {
     (user.resetPasswordOTP = undefined),

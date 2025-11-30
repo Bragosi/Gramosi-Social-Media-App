@@ -5,16 +5,20 @@ import { UseAuthStore } from "../store/UseAuthStore";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+
+
 const SignUp = () => {
   const navigate = useNavigate();
   const { register, isSigningUp } = UseAuthStore();
   const [showPassword, setshowPassword] = useState(false);
+  
   const [formData, setformData] = useState({
     userName: "",
     email: "",
     password: "",
     passwordConfirm: "",
   });
+
   const validateForm = () => {
     if (!formData.userName.trim()) return toast.error("Username is required");
     if (!formData.email.trim()) return toast.error("Email is required");
@@ -26,6 +30,7 @@ const SignUp = () => {
 
     return true;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = validateForm();

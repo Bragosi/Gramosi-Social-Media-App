@@ -8,13 +8,16 @@ import { Loader } from "lucide-react";
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const { forgotPassword, isSendingOtp } = UseAuthStore();
+
   const [formData, setformData] = useState({ identifier: "" });
+
   const validateForm = () => {
     if (!formData.identifier.trim())
       return toast.error("Username or Email is required");
 
     return true;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = validateForm();
@@ -39,6 +42,7 @@ const ForgotPassword = () => {
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Forgot Password ?
         </h1>
+        {/** Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="text-sm font-medium text-gray-700">

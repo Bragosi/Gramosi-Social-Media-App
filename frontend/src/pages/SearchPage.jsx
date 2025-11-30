@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import SideBar from "../components/SideBar";
 import { Link } from "react-router-dom";
 import { UseUserStore } from "../store/UseUserStore";
+import Avatar from "../../public/avatar.png";
 
 const SkeletonUser = () => (
   <div className="flex items-center gap-3 p-3 border-b animate-pulse">
@@ -48,14 +49,14 @@ const SearchPage = () => {
                 className="flex items-center gap-3 p-3 border-b hover:bg-gray-50 transition-colors"
               >
                 <img
-                  src={user.profilePicture || "/default-avatar.png"}
+                  src={user.profilePicture || Avatar}
                   alt={user.userName}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div>
                   <p className="font-semibold text-gray-800">{user.userName}</p>
                   <p className="text-sm text-gray-500 truncate w-64">
-                    {user.bio}
+                    {user.bio || " " }
                   </p>
                 </div>
               </Link>

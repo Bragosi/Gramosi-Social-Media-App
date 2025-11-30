@@ -5,6 +5,7 @@ import { UseAuthStore } from "../store/UseAuthStore";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login, isLogingIn } = UseAuthStore();

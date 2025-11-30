@@ -27,6 +27,7 @@ const ChangePasswordPage = () => {
 
     return true;
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
