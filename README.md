@@ -28,7 +28,7 @@ It allows users to create accounts, save posts, interact with content, and enjoy
 ---
 
 ## 🚀 Live Demo  
-👉 [View Gramosi Live Demo](https://chatosi-real-time-chat-app-1.onrender.com)  
+👉 [View Gramosi Live Demo](https://gramosi-social-media-app.onrender.com/)  
 
 
 ## 📸 Screenshots  
@@ -36,7 +36,8 @@ It allows users to create accounts, save posts, interact with content, and enjoy
 
 
 ### 🏠 Homepage  
-Homepage ![Screenshot_22-9-2025_163711_chatosi-real-time-chat-app-1 onrender com](https://github.com/user-attachments/assets/78c676dd-27ec-41c7-b2ee-0219013ef512)
+Homepage <img width="1366" height="768" alt="Screenshot (74)" src="https://github.com/user-attachments/assets/b32452c0-fc2b-4a2d-bfcf-1fa613ec69ca" />
+
 
 
  ### 👤 Profile Page
