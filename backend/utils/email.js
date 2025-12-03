@@ -1,25 +1,27 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (options) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      type: "OAuth2",
-      user: process.env.EMAIL,
-      clientId: process.env.GMAIL_CLIENT_ID,
-      clientSecret: process.env.GMAIL_CLIENT_SECRET,
-      refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-    },
-  });
+const sendEmail = async ({ to, subject, html }) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_FROM,    
+        pass: process.env.EMAIL_PASSWORD,  
+      },
+    });
 
-  const mailOptions = {
-    from: `"Gramosi" <${process.env.EMAIL}>`,
-    to: options.email,
-    subject: options.subject,
-    html: options.html,
-  };
+    await transporter.sendMail({
+      from: `"Gramosi App" <${process.env.EMAIL_FROM}>`,
+      to,
+      subject,
+      html,
+    });
 
-  await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${to}`);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw new Error("Failed to send email");
+  }
 };
 
 module.exports = sendEmail;

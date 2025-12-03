@@ -103,7 +103,7 @@ const signUp = CatchAsync(async (req, res, next) => {
   try {
     // Send OTP email
     await sendEmail({
-      email: newUser.email,
+      to: newUser.email,
       subject: "OTP for Email Verification",
       html: htmlTemplate,
     });
@@ -178,7 +178,7 @@ const ResendOTP = CatchAsync(async (req, res, next) => {
 
   try {
     await sendEmail({
-      email: user.email,
+      to: user.email,
       subject: "Resend OTP Verification",
       html: htmlTemplate,
     });
@@ -265,7 +265,7 @@ const ForgotPassword = CatchAsync(async (req, res, next) => {
   });
   try {
     await sendEmail({
-      email: user.email,
+      to: user.email,
       subject: "Password reset otp (Valid for 5min)",
       html: htmlTemplate,
     });

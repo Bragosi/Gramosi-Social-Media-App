@@ -98,7 +98,7 @@ const ResetPasswordPage = () => {
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 size-5" />
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter password"
+                placeholder="Enter New password"
                 value={formData.password}
                 onChange={(e) =>
                   setformData({ ...formData, password: e.target.value })
@@ -124,7 +124,7 @@ const ResetPasswordPage = () => {
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 size-5" />
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Confirm password"
+                placeholder="Confirm New password"
                 value={formData.passwordConfirm}
                 onChange={(e) =>
                   setformData({
