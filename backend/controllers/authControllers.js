@@ -66,6 +66,7 @@ const signUp = CatchAsync(async (req, res, next) => {
   if (!userName || !email || !password || !passwordConfirm) {
     return next(new AppError("Please fill all fields", 400));
   }
+
   const existingUser = await UsersModel.findOne({
     $or: [{ email }, { userName }],
   });
@@ -80,11 +81,17 @@ const signUp = CatchAsync(async (req, res, next) => {
       )
     );
   }
-  // Generate OTP and expiry
-  const otp = GenerateOtp();
-  const otpExpires = Date.now() + 24 * 60 * 60 * 1000;
 
-  // Create new user
+  let otp;
+  let otpExpires;
+
+  //  OTP ONLY IN DEVELOPMENT
+  if (process.env.NODE_ENV !== "production") {
+    otp = GenerateOtp();
+    otpExpires = Date.now() + 24 * 60 * 60 * 1000;
+  }
+
+  //  CREATE USER
   const newUser = await UsersModel.create({
     userName,
     email,
@@ -92,36 +99,43 @@ const signUp = CatchAsync(async (req, res, next) => {
     passwordConfirm,
     otp,
     otpExpires,
+    isVerified: process.env.NODE_ENV === "production",
   });
-  // ✅ Load and compile OTP email template
-  const htmlTemplate = loadTemplate("otpTemplate", {
-    title: "OTP Verification",
-    userName: newUser.userName,
-    otp,
-    message: "Your one-time password (OTP) for account verification is:",
-  });
-  try {
-    // Send OTP email
-    await sendEmail({
-      to: newUser.email,
-      subject: "OTP for Email Verification",
-      html: htmlTemplate,
-    });
-    // Send success response
-    createSendToken(
-      newUser,
-      201,
-      res,
-      "Registration successful. Check your email for OTP verification."
-    );
-  } catch (error) {
-    // Delete user if email fails to send
-    await UsersModel.findByIdAndDelete(newUser._id);
-    return next(
-      new AppError("Error sending OTP. Please try again later.", 500)
-    );
+
+  //  SEND EMAIL ONLY IN DEVELOPMENT
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      const htmlTemplate = loadTemplate("otpTemplate", {
+        title: "OTP Verification",
+        userName: newUser.userName,
+        otp,
+        message: "Your one-time password (OTP) for account verification is:",
+      });
+
+      await sendEmail({
+        to: newUser.email,
+        subject: "OTP for Email Verification",
+        html: htmlTemplate,
+      });
+    } catch (error) {
+      await UsersModel.findByIdAndDelete(newUser._id);
+      return next(
+        new AppError("Error sending OTP. Please try again later.", 500)
+      );
+    }
   }
+
+  // ✅ SUCCESS RESPONSE
+  createSendToken(
+    newUser,
+    201,
+    res,
+    process.env.NODE_ENV === "production"
+      ? "Registration successful."
+      : "Registration successful. Check your email for OTP verification."
+  );
 });
+
 
 // Verify account Controller
 const verifyAccount = CatchAsync(async (req, res, next) => {

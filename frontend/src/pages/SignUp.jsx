@@ -37,7 +37,7 @@ const SignUp = () => {
     if (!success) return;
     const result = await register(formData);
     if (result) {
-      navigate("/verifyAccount");
+      navigate("/");
     }
   };
 
