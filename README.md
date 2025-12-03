@@ -7,12 +7,19 @@ It allows users to create accounts, save posts, interact with content, and enjoy
 ---
 
 ## 🚀 Features
+
 -🔐 User authentication (signup, login & OTP verification)
+
 -📝 Create, view, and interact with posts
+
 -❤️ Like and engage with content
+
 -🔄 Infinite scrolling for posts
+
 -👤 User profiles
+
 -🔐 Secure authentication with JWT
+
 -📱 Fully responsive design
 
 ---
