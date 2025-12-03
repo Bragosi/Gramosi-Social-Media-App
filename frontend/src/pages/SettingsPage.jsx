@@ -32,14 +32,6 @@ const SettingsPage = () => {
             <EditIcon />
             Change password
           </Link>
-
-          <Link
-            to="/forgotPassword"
-            className="flex w-full text-gray-600 font-medium items-center gap-4 px-4 py-2 rounded-lg transition-all hover:bg-gray-600 font-serif hover:text-white"
-          >
-            <RefreshCcwDotIcon />
-            Reset Password
-          </Link>
           <div>
             {authUser?._id ? (
               <button
