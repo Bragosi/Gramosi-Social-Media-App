@@ -28,7 +28,7 @@ It allows users to create accounts, save posts, interact with content, and enjoy
 ---
 
 ## 🚀 Live Demo  
-👉 [View Chatosi Live Demo](https://chatosi-real-time-chat-app-1.onrender.com)  
+👉 [View Gramosi Live Demo](https://chatosi-real-time-chat-app-1.onrender.com)  
 
 
 ## 📸 Screenshots  
