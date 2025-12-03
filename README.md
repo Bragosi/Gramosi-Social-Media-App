@@ -36,16 +36,19 @@ It allows users to create accounts, save posts, interact with content, and enjoy
 
 
 ### 🏠 Homepage  
-Homepage <img width="1366" height="768" alt="Screenshot (74)" src="https://github.com/user-attachments/assets/b32452c0-fc2b-4a2d-bfcf-1fa613ec69ca" />
+<img width="1366" height="653" alt="Screenshot (74)" src="https://github.com/user-attachments/assets/3dde3731-a18e-4bc8-98fc-fc7673d56247" />
+
 
 
 
  ### 👤 Profile Page
-![Screenshot_22-9-2025_16428_chatosi-real-time-chat-app-1 onrender com](https://github.com/user-attachments/assets/75a1ac04-0aeb-44d9-8a9e-7a4857002a4f)
+<img width="1366" height="618" alt="Screenshot (75)" src="https://github.com/user-attachments/assets/ae540e9c-5b3b-47c3-bc0d-39c0919b4eb8" />
+
 
 
 ### 💬 Create Post Page
-![Screenshot_22-9-2025_163918_chatosi-real-time-chat-app-1 onrender com](https://github.com/user-attachments/assets/2e083d22-1399-4bb9-a8a2-83b0bfd05ebd)
+<img width="1366" height="637" alt="Screenshot (76)" src="https://github.com/user-attachments/assets/227f1584-8e33-4e1e-874c-1c93a163a5de" />
+
 
 
 
