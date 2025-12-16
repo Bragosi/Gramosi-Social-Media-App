@@ -89,7 +89,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar only for logged-in users on desktop */}
+      {/* Sidebar */}
       <div className="hidden md:block">
         <SideBar />
       </div>
@@ -220,10 +220,10 @@ const HomePage = () => {
 
               {/* Comment Section */}
               {activePost === post._id && (
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-4 overflow-x-hidden">
                   <div className="mt-3 space-y-3">
                     {post.comments.map((c) => (
-                      <div key={c._id} className="flex gap-2 items-start">
+                      <div key={c._id} className="flex gap-2 items-start ">
                         <img
                           src={c.user?.profilePicture || "/avatar.png"}
                           alt="avatar"
